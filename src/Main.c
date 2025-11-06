@@ -10,7 +10,7 @@ void Setup(AlxWindow* w){
 
     dls = DLS_Make_Std();
 }
-void Update(double ElapsedTime){
+void Update(AlxWindow* w){
     if(Stroke(ALX_KEY_ENTER).PRESSED){
         DLS_Execute(&dls);
     }
@@ -27,17 +27,19 @@ void Update(double ElapsedTime){
 
     if(Stroke(ALX_MOUSE_L).PRESSED){
         if(focusedPin>=0){
-            Pin* fp = (Pin*)Vector_Get(&dls.pins,focusedPin);
-            int itp = DLS_Pin_Find(&dls,Vec2_Divf(GetMouse(),GetWidth()));
+            Pin* fp = (Pin*)PVector_Get(&dls.pins,focusedPin);
+            int itp = DLS_Pin_FindI(&dls,Vec2_Divf(GetMouse(),GetWidth()));
             if(itp>=0){
-                Pin* p = (Pin*)Vector_Get(&dls.pins,itp);
-                if(fp->t==SIGNALTYPE_INPUT && p->t==SIGNALTYPE_OUTPUT) Vector_Push(&dls.wires,(Wire[]){ Wire_New(focusedPin,itp) });
-                if(fp->t==SIGNALTYPE_OUTPUT && p->t==SIGNALTYPE_INPUT) Vector_Push(&dls.wires,(Wire[]){ Wire_New(itp,focusedPin) });
+                Pin* p = (Pin*)PVector_Get(&dls.pins,itp);
+                if(fp->t==CIRCUIT_SIGNALTYPE_INPUT && p->t==CIRCUIT_SIGNALTYPE_OUTPUT)
+                    Vector_Push(&dls.wires,(Wire[]){ Wire_New(focusedPin,itp) });
+                if(fp->t==CIRCUIT_SIGNALTYPE_OUTPUT && p->t==CIRCUIT_SIGNALTYPE_INPUT)
+                    Vector_Push(&dls.wires,(Wire[]){ Wire_New(itp,focusedPin) });
             }
             focusedPin = -1;
         }else{
             focusedChip = DLS_GChip_Find(&dls,Vec2_Divf(GetMouse(),GetWidth()));
-            focusedPin = DLS_Pin_Find(&dls,Vec2_Divf(GetMouse(),GetWidth()));
+            focusedPin = DLS_Pin_FindI(&dls,Vec2_Divf(GetMouse(),GetWidth()));
         }
     }
     if(Stroke(ALX_MOUSE_L).DOWN){
@@ -51,7 +53,7 @@ void Update(double ElapsedTime){
     DLS_Render(WINDOW_STD_ARGS,&dls);
 
     if(focusedPin>=0){
-        Pin* p = (Pin*)Vector_Get(&dls.pins,focusedPin);
+        Pin* p = (Pin*)PVector_Get(&dls.pins,focusedPin);
         Vec2 pos = Vec2_Mulf(Vec2_Add(p->p,(Vec2){ PIN_SIZE*0.5f,PIN_SIZE*0.5f }),GetWidth());
         RenderLine(pos,GetMouse(),RED,1.0f);
     }
