@@ -1,13 +1,45 @@
 #include "/home/codeleaded/System/Static/Library/WindowEngine1.0.h"
 #include "/home/codeleaded/System/Static/Library/DLS.h"
 
+/*
+
+OR 2 -> 1:
+- NOT \ 
+       AND - NOT
+- NOT /
+
+
+2 => f => 1:
+f:= %0 = !(!$0 & !$1)
+
+Functiontree:
+n -> function(*ins,*outs)
+t -> functionwrapper{ins,outs,functionwrapper}:
+
+STD:
+    AND(2,1),NOT(1,1)
+
+FUNCS:
+    AND,NOT,NOT,NOT
+
+INPUTS:
+    LIST: (Pins itself)
+        VALUE,
+        LIST: (FUNCS index,PIN index) (Pin IN to TARGET)
+
+Counting how many inputs were already set:
+    if ins set == ins there -> on execute STACK
+    else                    -> on waiting STACK
+
+*/
+
+
 DLS dls;
 GChip* focusedChip = NULL;
 int focusedPin = -1;
 
 void Setup(AlxWindow* w){
     ResizeAlxFont(16,16);
-
     dls = DLS_Make_Std();
 }
 void Update(AlxWindow* w){
