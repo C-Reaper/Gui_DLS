@@ -40,27 +40,29 @@ int focusedPin = -1;
 
 void Setup(AlxWindow* w){
     ResizeAlxFont(16,16);
-    dls = DLS_Make_Std();
+    dls = DLS_Make_Std(GetWidth(),GetHeight());
 }
 void Update(AlxWindow* w){
+    TransformedView_HandlePanZoom(&dls.tv,w->Strokes,GetMouse());
+    
     if(Stroke(ALX_KEY_ENTER).PRESSED){
         DLS_Execute(&dls);
     }
-    if(Stroke(ALX_KEY_A).PRESSED){
+    if(Stroke(ALX_KEY_E).PRESSED){
         focusedChip = NULL;
         focusedPin = -1;
-        DLS_AddChip(&dls,Vec2_Divf(GetMouse(),GetWidth()),"AND");
+        DLS_AddChip(&dls,GetMouse(),"AND");
     }
-    if(Stroke(ALX_KEY_N).PRESSED){
+    if(Stroke(ALX_KEY_D).PRESSED){
         focusedChip = NULL;
         focusedPin = -1;
-        DLS_AddChip(&dls,Vec2_Divf(GetMouse(),GetWidth()),"NOT");
+        DLS_AddChip(&dls,GetMouse(),"NOT");
     }
 
     if(Stroke(ALX_MOUSE_L).PRESSED){
         if(focusedPin>=0){
             Pin* fp = (Pin*)PVector_Get(&dls.pins,focusedPin);
-            int itp = DLS_Pin_FindI(&dls,Vec2_Divf(GetMouse(),GetWidth()));
+            int itp = DLS_Pin_FindI(&dls,GetMouse());
             if(itp>=0){
                 Pin* p = (Pin*)PVector_Get(&dls.pins,itp);
                 if(fp->t==CIRCUIT_SIGNALTYPE_INPUT && p->t==CIRCUIT_SIGNALTYPE_OUTPUT)
@@ -70,13 +72,14 @@ void Update(AlxWindow* w){
             }
             focusedPin = -1;
         }else{
-            focusedChip = DLS_GChip_Find(&dls,Vec2_Divf(GetMouse(),GetWidth()));
-            focusedPin = DLS_Pin_FindI(&dls,Vec2_Divf(GetMouse(),GetWidth()));
+            focusedChip = DLS_GChip_Find(&dls,GetMouse());
+            focusedPin = DLS_Pin_FindI(&dls,GetMouse());
         }
     }
     if(Stroke(ALX_MOUSE_L).DOWN){
         if(focusedChip){
-            focusedChip->p = Vec2_Divf(GetMouse(),GetWidth());
+            const Vec2 wm = TransformedView_ScreenWorldPos(&dls.tv,GetMouse());
+            focusedChip->p = wm;
         }
     }
     
@@ -86,8 +89,9 @@ void Update(AlxWindow* w){
 
     if(focusedPin>=0){
         Pin* p = (Pin*)PVector_Get(&dls.pins,focusedPin);
-        Vec2 pos = Vec2_Mulf(Vec2_Add(p->p,(Vec2){ PIN_SIZE*0.5f,PIN_SIZE*0.5f }),GetWidth());
-        RenderLine(pos,GetMouse(),RED,1.0f);
+        const Vec2 pos = Vec2_Add(p->p,(Vec2){ PIN_SIZE*0.5f,PIN_SIZE*0.5f });
+        const Vec2 sp = TransformedView_WorldScreenPos(&dls.tv,pos);
+        RenderLine(sp,GetMouse(),RED,1.0f);
     }
 }
 void Delete(AlxWindow* w){
