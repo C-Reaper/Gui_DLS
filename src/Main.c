@@ -48,12 +48,23 @@ void Update(AlxWindow* w){
     if(Stroke(ALX_KEY_ENTER).PRESSED){
         DLS_Execute(&dls);
     }
-    if(Stroke(ALX_KEY_E).PRESSED){
+
+    if(Stroke(ALX_KEY_1).PRESSED){
+        focusedChip = NULL;
+        focusedPin = -1;
+        DLS_AddChip(&dls,GetMouse(),"IN");
+    }
+    if(Stroke(ALX_KEY_2).PRESSED){
+        focusedChip = NULL;
+        focusedPin = -1;
+        DLS_AddChip(&dls,GetMouse(),"OUT");
+    }
+    if(Stroke(ALX_KEY_3).PRESSED){
         focusedChip = NULL;
         focusedPin = -1;
         DLS_AddChip(&dls,GetMouse(),"AND");
     }
-    if(Stroke(ALX_KEY_D).PRESSED){
+    if(Stroke(ALX_KEY_4).PRESSED){
         focusedChip = NULL;
         focusedPin = -1;
         DLS_AddChip(&dls,GetMouse(),"NOT");
@@ -81,6 +92,26 @@ void Update(AlxWindow* w){
             const Vec2 wm = TransformedView_ScreenWorldPos(&dls.tv,GetMouse());
             focusedChip->p = wm;
         }
+    }
+    if(Stroke(ALX_KEY_REMOVE).PRESSED){
+        if(focusedChip){
+            const int iter = DLS_GChip_Iter(&dls,focusedChip);
+            DLS_RemoveChip(&dls,iter);
+        }
+    }
+
+    if(Stroke(ALX_MOUSE_R).PRESSED){
+        GChip* fc = DLS_GChip_Find(&dls,GetMouse());
+        if(fc){
+            if(CStr_Cmp(fc->cw->name,"IN")){
+                Pin* p = *(Pin**)Vector_Get(&fc->input,0);
+                if(p->s == CIRCUIT_SIGNAL_HIGH) p->s = CIRCUIT_SIGNAL_LOW;
+                else                            p->s = CIRCUIT_SIGNAL_HIGH;
+            }
+        }
+    }
+    if(Stroke(ALX_KEY_ENTER).PRESSED){
+        DLS_Execute(&dls);
     }
     
     Clear(DARK_GRAY);
