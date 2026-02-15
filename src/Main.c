@@ -35,12 +35,10 @@ Counting how many inputs were already set:
 
 
 DLS dls;
-GChip* focusedChip = NULL;
-int focusedPin = -1;
 
 void Setup(AlxWindow* w){
     ResizeAlxFont(16,16);
-    dls = DLS_Make_Std(GetWidth(),GetHeight());
+    dls = DLS_New_Std();
 }
 void Update(AlxWindow* w){
     TransformedView_HandlePanZoom(&dls.tv,w->Strokes,GetMouse());
@@ -50,26 +48,19 @@ void Update(AlxWindow* w){
     }
 
     if(Stroke(ALX_KEY_1).PRESSED){
-        focusedChip = NULL;
-        focusedPin = -1;
         DLS_AddChip(&dls,GetMouse(),"IN");
     }
     if(Stroke(ALX_KEY_2).PRESSED){
-        focusedChip = NULL;
-        focusedPin = -1;
         DLS_AddChip(&dls,GetMouse(),"OUT");
     }
     if(Stroke(ALX_KEY_3).PRESSED){
-        focusedChip = NULL;
-        focusedPin = -1;
         DLS_AddChip(&dls,GetMouse(),"AND");
     }
     if(Stroke(ALX_KEY_4).PRESSED){
-        focusedChip = NULL;
-        focusedPin = -1;
         DLS_AddChip(&dls,GetMouse(),"NOT");
     }
 
+    /*
     if(Stroke(ALX_MOUSE_L).PRESSED){
         if(focusedPin>=0){
             Pin* fp = (Pin*)PVector_Get(&dls.pins,focusedPin);
@@ -113,21 +104,20 @@ void Update(AlxWindow* w){
     if(Stroke(ALX_KEY_ENTER).PRESSED){
         DLS_Execute(&dls);
     }
-    
+    */
+
     Clear(DARK_GRAY);
 
-    DLS_Render(WINDOW_STD_ARGS,&dls);
+    DLS_Render(&dls,WINDOW_STD_ARGS);
 
-    if(focusedPin>=0){
-        Pin* p = (Pin*)PVector_Get(&dls.pins,focusedPin);
-        const Vec2 pos = Vec2_Add(p->p,(Vec2){ PIN_SIZE*0.5f,PIN_SIZE*0.5f });
-        const Vec2 sp = TransformedView_WorldScreenPos(&dls.tv,pos);
-        RenderLine(sp,GetMouse(),RED,1.0f);
-    }
+    // if(focusedPin>=0){
+    //     Pin* p = (Pin*)PVector_Get(&dls.pins,focusedPin);
+    //     const Vec2 pos = Vec2_Add(p->p,(Vec2){ PIN_SIZE*0.5f,PIN_SIZE*0.5f });
+    //     const Vec2 sp = TransformedView_WorldScreenPos(&dls.tv,pos);
+    //     RenderLine(sp,GetMouse(),RED,1.0f);
+    // }
 }
 void Delete(AlxWindow* w){
-    focusedChip = NULL;
-    focusedPin = -1;
     DLS_Free(&dls);
 }
 
